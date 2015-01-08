@@ -1,7 +1,6 @@
 # iris 2014-7-1
-# adapt to TEI xml format 
-# first place the p-breaks on the next line:
-# perl -pe 's/<\/p>/\n<\/p>/g' 
+# adapt to TEI xml format of Thucydides
+
 
 # beta2unicode.py
 #
@@ -353,25 +352,39 @@ def beta2unicodeTrie():
     
     t.add("\n", u"")
     
+    # edits by iris:
+    # greek small letter omega with psili and oxia and ypogegrammeni U+1FA4
+    t.add("W)/|",      u"\u1FA4")
+    # *)W  -> greek capital letter omega with psili (U+1F68)
+    t.add("*)W",      u"\u1F68")
+
+    # some HTML entities that occur in the XML text.	
+    t.add("&RPAR;",      ")")
+    t.add("&LPAR;",      "(")
+    t.add("&DAGGER;",	u"\u2020")  
+   
     
     return t
 
 t = beta2unicodeTrie()
 
 import os, re, codecs, sys
+inbody=0
 
 for line in file(sys.argv[1]):
-    if(re.match("<milestone", line)):
-        #print line
-        m = re.match('(\<milestone.*>)(.*)',line)
-        print m.group(1),   #group(0) = whole string, 1 = first bracket part, etc.
-        betacodestr = m.group(2).upper()
-        a, b = t.convert(betacodestr)
-        if b:
-            print(a.encode("utf-8"), b)
-            raise Exception
-        print(a.encode("utf-8"))
-
+ 
+    if(re.match("<body>", line)):
+        inbody=1
+    if(inbody==0):
+        print line,
+    elif( inbody==1 and re.match("\<", line)):
+        print line,
     else:
-        print line, 
+        a, b = t.convert(line.upper())
+        if b:
+            print a.encode("utf-8"), b
+           
+            #raise Exception
+        print a.encode("utf-8")
+
 
