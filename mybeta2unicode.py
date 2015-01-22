@@ -357,6 +357,8 @@ def beta2unicodeTrie():
     t.add("W)/|",      u"\u1FA4")
     # *)W  -> greek capital letter omega with psili (U+1F68)
     t.add("*)W",      u"\u1F68")
+    # *(/o -> greek capital letter omicron with dasia and oxia (U+1F4D)
+    t.add("*(/O",      u"\u1F4D")
 
     # some HTML entities that occur in the XML text.	
     t.add("&RPAR;",      ")")
@@ -382,9 +384,17 @@ for line in file(sys.argv[1]):
     else:
         a, b = t.convert(line.upper())
         if b:
+            #sigmas and word final positions have special code
+            #greek small letter sigma (U+03C3)
+	    # convert to:			
+	    #greek small letter final sigma (U+03C2)    	 
+	    #re.sub(re.compile(u"\u03C3\\b"),  u"\u03C2", a )
+	    # im not gonne waist my time to resolve this python stuff
+	    # 
+		
             print a.encode("utf-8"), b
            
             #raise Exception
         print a.encode("utf-8")
-
+      
 
